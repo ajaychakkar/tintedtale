@@ -1,0 +1,42 @@
+body, html {
+    margin: 0;
+    height: 100%;
+}
+
+.main-wrapper {
+    background-color: #ebebeb;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    height: 100%;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    display: flex;
+}
+.wrapper {
+    height: 85%;
+    display: flex;
+}
+.inner-wrapper {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+}
+.circle-outer {
+    position: relative;
+    height: 0;
+    background: linear-gradient(to right, #eb2f72 0%, #ed494e 100%);
+    width: 100%;
+    padding-bottom: 100%;
+    border-radius: 50%;
+}
+.circle-inner {
+    position: absolute;
+    background: white;
+    width: 50%;
+    height: 50%;
+    left: 25%;
+    top: 25%;
+    border-radius: 50%;
+    pointer-events: none;
+}
