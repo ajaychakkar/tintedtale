@@ -58,48 +58,74 @@ function calculateMovePoint(e) {
         var _offsetY = e.pageY - mainCircle.top;
         var _deltaX = _offsetX;
         var _deltaY = _offsetY;
-        var _angle = Math.atan((_deltaY - mainCircle.radius) / (_deltaX - mainCircle.radius));
-        if(mainCircle.radius < _deltaX ) {
-            var outerX = mainCircle.radius + Math.cos(_angle) * mainCircle.radius;
-            var outerY = mainCircle.radius + Math.sin(_angle) * mainCircle.radius;
-            var innerX = _deltaX + Math.cos(_angle) * innerCircle.radius;
-            var innerY = _deltaY + Math.sin(_angle) * innerCircle.radius;
-            if(mainCircle.radius > _deltaY) {
-                if(innerX > outerX && innerY < outerY) {
-                    _deltaX = outerX - innerCircle.radius * Math.cos(_angle);
-                    _deltaY = outerY - innerCircle.radius * Math.sin(_angle);
-                } 
-            } else {
-                if(innerX > outerX && innerY > outerY) {
-                    _deltaX = outerX - innerCircle.radius * Math.cos(_angle);
-                    _deltaY = outerY - innerCircle.radius * Math.sin(_angle);
-                } 
-            }
-        } else {
-            var outerX = mainCircle.radius - Math.cos(_angle) * mainCircle.radius;
-            var outerY = mainCircle.radius - Math.sin(_angle) * mainCircle.radius;
-            var innerX = _deltaX - Math.cos(_angle) * innerCircle.radius;
-            var innerY = _deltaY - Math.sin(_angle) * innerCircle.radius;
-            if(mainCircle.radius > _deltaY) {
-                if(innerX < outerX && innerY < outerY) {
-                    _deltaX = outerX + innerCircle.radius * Math.cos(_angle);
-                    _deltaY = outerY + innerCircle.radius * Math.sin(_angle);
-                } 
-            } else {
-                if(innerX < outerX && innerY > outerY) {
-                    _deltaX = outerX + innerCircle.radius * Math.cos(_angle);
-                    _deltaY = outerY + innerCircle.radius * Math.sin(_angle);
-                } 
-            }
-        }
-        var _left =  _deltaX - innerCircle.radius
-        var _top = _deltaY - innerCircle.radius;
-        $(innerCircle.elem).css({
-            'left': _left + 'px',
-            'top':  _top + 'px',
-        });
+        var temp = setInnerCircle(_deltaX , _deltaY);
+        setLeftTop(temp.deltax, temp.deltay);
     }
 }  
+function setInnerCircle(_deltaX , _deltaY, ignoreValues) {
+    var _angle = Math.atan((_deltaY - mainCircle.radius) / (_deltaX - mainCircle.radius));
+    if(mainCircle.radius < _deltaX ) {
+        var outerX = mainCircle.radius + Math.cos(_angle) * mainCircle.radius;
+        var outerY = mainCircle.radius + Math.sin(_angle) * mainCircle.radius;
+        var innerX = _deltaX + Math.cos(_angle) * innerCircle.radius;
+        var innerY = _deltaY + Math.sin(_angle) * innerCircle.radius;
+        if(mainCircle.radius > _deltaY) {
+            if(innerX > outerX && innerY < outerY) {
+                _deltaX = outerX - innerCircle.radius * Math.cos(_angle);
+                _deltaY = outerY - innerCircle.radius * Math.sin(_angle);
+                _x = _deltaX;
+                _y = _deltaY;
+                return { deltax: _deltaX , deltay: _deltaY };
+            } 
+        } else {
+            if(innerX > outerX && innerY > outerY) {
+                _deltaX = outerX - innerCircle.radius * Math.cos(_angle);
+                _deltaY = outerY - innerCircle.radius * Math.sin(_angle);
+                _x = _deltaX;
+                _y = _deltaY;
+                return { deltax: _deltaX , deltay: _deltaY };
+            } 
+        }
+    } else {
+        var outerX = mainCircle.radius - Math.cos(_angle) * mainCircle.radius;
+        var outerY = mainCircle.radius - Math.sin(_angle) * mainCircle.radius;
+        var innerX = _deltaX - Math.cos(_angle) * innerCircle.radius;
+        var innerY = _deltaY - Math.sin(_angle) * innerCircle.radius;
+        if(mainCircle.radius > _deltaY) {
+            if(innerX < outerX && innerY < outerY) {
+                _deltaX = outerX + innerCircle.radius * Math.cos(_angle);
+                _deltaY = outerY + innerCircle.radius * Math.sin(_angle);
+                _x = _deltaX;
+                _y = _deltaY;
+                return { deltax: _deltaX , deltay: _deltaY };
+            } 
+        } else {
+            if(innerX < outerX && innerY > outerY) {
+                _deltaX = outerX + innerCircle.radius * Math.cos(_angle);
+                _deltaY = outerY + innerCircle.radius * Math.sin(_angle);
+                _x = _deltaX;
+                _y = _deltaY;
+                return { deltax: _deltaX , deltay: _deltaY };
+            } 
+        }
+    }
+    if(ignoreValues) {
+        return false;
+    } else {
+        return { deltax: _deltaX , deltay: _deltaY };
+    }
+    
+    
+}
+
+function setLeftTop(_deltaX, _deltaY) {
+    var _left =  _deltaX - innerCircle.radius;
+    var _top = _deltaY - innerCircle.radius;
+    $(innerCircle.elem).css({
+        'left': _left + 'px',
+        'top':  _top + 'px',
+    });
+}
 
 function deviceSupport() {
     if(window.DeviceMotionEvent && BrowserDetect.any()) {
@@ -110,39 +136,59 @@ function deviceSupport() {
 var alpha,beta, gamma, ax1,ay1,az1,ax,ay,az;
 var velocityX = 0, velocityY = 0;
 var _x = 0; _y = 0;
+var prevAX, prevAY, signX;
 function motionEvent(e) {
     ax1 = e.acceleration.x;
     ay1 = e.acceleration.y;
     az1 = e.acceleration.z;
-    ax = e.accelerationIncludingGravity.x.toFixed(1);
-    ay = e.accelerationIncludingGravity.y.toFixed(1);
+    ax = e.accelerationIncludingGravity.x.toFixed(0);
+    ay = e.accelerationIncludingGravity.y.toFixed(0);
     az = e.accelerationIncludingGravity.z;
+    if((prevAX == 1 && ax < 0) || (prevAX == -1 && ax > 0)) {
+        velocityX = 0;  
+    }
+    if((prevAY == 1 && ay < 0) || (prevAY == -1 && ay > 0)) {
+        velocityY = 0;  
+    }
                     
     alpha = e.rotationRate.alpha;
     beta = e.rotationRate.beta;
     gamma = e.rotationRate.gamma;
     if( ax != 0){
         velocityX = velocityX + (ax * 0.01);
-        _x = _x + velocityX * 0.01 + 0.5 * ax * 0.01 *0.01;
+        _x = _x - velocityX * 0.01;
     }
     if( ay != 0) {
         velocityY = velocityY + (ay * 0.01);
-        _y = _y + velocityY * 0.01 + 0.5 * ay * 0.01 *0.01;
+        _y = _y + velocityY * 0.01 ;
+    }
+    if(Math.sqrt((_x * _x) + (_y * _y)) > (mainCircle.radius - innerCircle.radius)) {
+        setInnerCircle(mainCircle.radius + _x , mainCircle.radius + _y, true);
+        _x = _x - mainCircle.radius;
+        _y = _y - mainCircle.radius;
+    }
+
+    if(ax > 0) {
+        prevAX = 1;
+    } else if(ax < 0){
+        prevAX = -1;
+    }
+
+    if(ay > 0) {
+        prevAY = 1;
+    } else if(ay < 0){
+        prevAY = -1;
     }
     
 }
 function refreshValues() {
     setInterval(function() {
-        var str = 'x=' + ax1 + '::  y=' + ay1 + '::  z=' + az1 + '<br>  x1=' + ax + '::  y1=' + ay + '::  z1=' + az + '<br>  alpha=' + alpha + '::  beta=' + beta +'::  gamma=' + gamma + '<br> _x = ' + _x + ' :: _y= '+ _y;
+        var str = 'x1=' + ax + '::  y1=' + ay + '::  z1=' + az + '<br>  alpha=' + alpha + '::  beta=' + beta +'::  gamma=' + gamma + '<br> _x = ' + _x + ' :: _y= '+ _y;
         $('#test').html(str);
-        var _xFactor = 0;
-        var _yFactor = 0;
-        var _left = ( (innerCircle.centerX + _x) - innerCircle.radius ) - _xFactor;
-        var _top = (innerCircle.centerY + _y) - innerCircle.radius;
-        $(innerCircle.elem).css({
-            'left': _left + 'px',
-            'top':  _top + 'px',
-        }); 
+        var _temp = setInnerCircle(innerCircle.centerX + _x , innerCircle.centerY + _y);
+        var _left = _temp.deltax;
+        var _top = _temp.deltay;
+        setLeftTop(_left , _top);
     },10);
 }
 //=============================================================================
