@@ -41,16 +41,31 @@ function getCircleDimension() {
 }
 
 function setMouseEvent() {
-    $(mainCircle.elem).off('mousemove touchmove touchstart').on('mousemove touchmove touchstart', mouseMoveEvent);
+    if(BrowserDetect.any()) {
+        $(mainCircle.elem).off('touchmove touchstart touchend').on('touchmove touchstart touchend', mouseMoveEvent);
+    } else {
+        $(mainCircle.elem).off('mousemove').on('mousemove', mouseMoveEvent);
+    }
+    
 }
 
 function mouseMoveEvent(e) {
+    
     if(e.type == "touchmove" || e.type == "touchstart") {
+        touch = true;
         e.pageX = e.originalEvent.touches[0].pageX;
         e.pageY = e.originalEvent.touches[0].pageY;
+        clearInterval(interVal);
+    }
+    if(e.type == 'touchend') {
+        touch = false; 
+        velocityX = 0;
+        velocityY = 0;
+        refreshValues();
     }
     calculateMovePoint(e);
 }
+
 function calculateMovePoint(e) {
     if(e.pageX >=  mainCircle.left && e.pageX <=  (mainCircle.left + mainCircle.width) && 
        e.pageY >=  mainCircle.top && e.pageY <=  (mainCircle.top + mainCircle.height)) {
@@ -58,6 +73,10 @@ function calculateMovePoint(e) {
         var _offsetY = e.pageY - mainCircle.top;
         var _deltaX = _offsetX;
         var _deltaY = _offsetY;
+        if(e.type == 'touchmove') {
+            _x = _offsetX - mainCircle.radius;
+            _y = _offsetY - mainCircle.radius;
+        }
         var temp = setInnerCircle(_deltaX , _deltaY);
         setLeftTop(temp.deltax, temp.deltay);
     }
@@ -137,7 +156,11 @@ var alpha,beta, gamma, ax1,ay1,az1,ax,ay,az;
 var velocityX = 0, velocityY = 0;
 var _x = 0; _y = 0;
 var prevAX, prevAY, signX;
+var touch = false;
 function motionEvent(e) {
+    if(touch) {
+        return;
+    }
     ax1 = e.acceleration.x;
     ay1 = e.acceleration.y;
     az1 = e.acceleration.z;
@@ -155,11 +178,11 @@ function motionEvent(e) {
     beta = e.rotationRate.beta;
     gamma = e.rotationRate.gamma;
     if( ax != 0){
-        velocityX = velocityX + (ax * 0.01);
+        velocityX = velocityX + (ax * 1);
         _x = _x - velocityX * 0.01;
     }
     if( ay != 0) {
-        velocityY = velocityY + (ay * 0.01);
+        velocityY = velocityY + (ay * 1);
         _y = _y + velocityY * 0.01 ;
     }
     if(Math.sqrt((_x * _x) + (_y * _y)) > (mainCircle.radius - innerCircle.radius)) {
@@ -181,8 +204,9 @@ function motionEvent(e) {
     }
     
 }
+var interVal;
 function refreshValues() {
-    setInterval(function() {
+    interVal = setInterval(function() {
         var str = 'x1=' + ax + '::  y1=' + ay + '::  z1=' + az + '<br>  alpha=' + alpha + '::  beta=' + beta +'::  gamma=' + gamma + '<br> _x = ' + _x + ' :: _y= '+ _y;
         $('#test').html(str);
         var _temp = setInnerCircle(innerCircle.centerX + _x , innerCircle.centerY + _y);
