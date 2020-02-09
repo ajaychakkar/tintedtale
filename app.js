@@ -18,6 +18,7 @@ window.onload = function() {
     getCircleDimension();
     setMouseEvent();
     deviceSupport();
+    refreshValues();
 };
 window.addEventListener('resize', getCircleDimension);
 function getCircleDimension() {
@@ -67,24 +68,43 @@ function calculateMovePoint(e) {
             'top':  _top + 'px',
         }); 
     }
-    alert(alpha)
-    
 }  
-
 
 function deviceSupport() {
     if(window.DeviceMotionEvent) {
+        console.log(window.DeviceMotionEvent);
         window.addEventListener('devicemotion', motionEvent);       
     }
 }
-var alpha;
+var alpha,beta, gamma, ax1,ay1,az1,ax,ay,az;
+var velocityX = 0, velocityY = 0;
+var _x = 0; _y = 0;
 function motionEvent(e) {
     console.log(e);
-    var x = e.acceleration.x;
-    var y = e.acceleration.y;
-    var z = e.acceleration.z;
+
+    ax1 = e.acceleration.x;
+    ay1 = e.acceleration.y;
+    az1 = e.acceleration.z;
+    ax = (e.accelerationIncludingGravity.x.toFixed(1) - 0.2).toFixed(1) ;
+    ay = e.accelerationIncludingGravity.y.toFixed(1);
+    az = e.accelerationIncludingGravity.z;
                     
     alpha = e.rotationRate.alpha;
-    var rbeta = e.rotationRate.beta;
-    var rgamma = e.rotationRate.gamma;
+    beta = e.rotationRate.beta;
+    gamma = e.rotationRate.gamma;
+    if( ax != 0){
+        velocityX = velocityX + (ax * 0.01);
+        _x = _x + velocityX * 0.01 + 0.5 * ax * 0.01 *0.01;
+    }
+    if( ay != 0) {
+        velocityY = velocityY + (ay * 0.01);
+        _y = _y + velocityY * 0.01 + 0.5 * ay * 0.01 *0.01;
+    }
+    
+}
+function refreshValues() {
+    setInterval(function() {
+        var str = 'x=' + ax1 + '::  y=' + ay1 + '::  z=' + az1 + '<br>  x1=' + ax + '::  y1=' + ay + '::  z1=' + az + '<br>  alpha=' + alpha + '::  beta=' + beta +'::  gamma=' + gamma + '<br> _x = ' + _x + ' :: _y= '+ _y;
+        $('#test').html(str);
+    },1000);
 }
