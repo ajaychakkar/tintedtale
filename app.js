@@ -165,15 +165,19 @@ function resetvalues() {
     velocityX = 0;
     velocityY = 0;
     _x = 0;
-    _y = 0;  
+    _y = 0;
 }
 var alpha,beta, gamma, ax1,ay1,az1,ax,ay,az;
 var velocityX = 0, velocityY = 0;
 var _x = 0; _y = 0;
 var prevAX, prevAY, signX;
 var touch = false;
+var snappingToCenter = false;
 function motionEvent(e) {
     if(touch) {
+        return;
+    }
+    if(snappingToCenter) {
         return;
     }
     ax1 = e.acceleration.x;
@@ -207,10 +211,15 @@ function motionEvent(e) {
     }
 
     if(ax == 0 && ay == 0) {
+        snappingToCenter = true;
+        clearInterval(interVal);
         moveInnerCircleToCenter();
         resetvalues();
-    } else {
-        $(innerCircle.elem).removeClass('moveTocenter');
+        setTimeout(function(){
+            $(innerCircle.elem).removeClass('moveTocenter');
+            snappingToCenter = false;
+            refreshValues();
+        },1000);
     }
 
     if(ax > 0) {
@@ -229,7 +238,7 @@ function motionEvent(e) {
 var interVal;
 function refreshValues() {
     interVal = setInterval(function() {
-        var str = 'x1=' + ax + '::  y1=' + ay + '::  z1=' + az + '<br>  alpha=' + alpha + '::  beta=' + beta +'::  gamma=' + gamma + '<br> _x = ' + _x + ' :: _y= '+ _y;
+        var str = 'x1=' + ax + '::  y1=' + ay + '::  z1=' + az + '<br> _x = ' + _x + ' :: _y= '+ _y;
         $('#test').html(str);
         var _temp = setInnerCircle(innerCircle.centerX + _x , innerCircle.centerY + _y);
         var _left = _temp.deltax;
