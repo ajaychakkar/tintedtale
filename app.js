@@ -51,7 +51,6 @@ function setMouseEvent() {
 }
 
 function mouseMoveEventmouseOutsideCircle(e) {
-    console.log(e);
     moveInnerCircleToCenter();
 }
 function moveInnerCircleToCenter() {
