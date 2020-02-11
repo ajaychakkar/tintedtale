@@ -208,8 +208,10 @@ function motionEvent(e) {
     }
 
     if(ax == 0 && ay == 0) {
-        setInnerCircle();
+        moveInnerCircleToCenter();
         resetvalues();
+    } else {
+        $(innerCircle.elem).removeClass('moveTocenter');
     }
 
     if(ax > 0) {
