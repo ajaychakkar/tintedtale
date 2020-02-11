@@ -45,12 +45,22 @@ function setMouseEvent() {
         $(mainCircle.elem).off('touchmove touchstart touchend').on('touchmove touchstart touchend', mouseMoveEvent);
     } else {
         $(mainCircle.elem).off('mousemove').on('mousemove', mouseMoveEvent);
+        $(mainCircle.elem).off('mouseout').on('mouseout', mouseMoveEventmouseOutsideCircle);
     }
     
 }
 
+function mouseMoveEventmouseOutsideCircle(e) {
+    console.log(e);
+    moveInnerCircleToCenter();
+}
+function moveInnerCircleToCenter() {
+    setLeftTop(mainCircle.radius, mainCircle.radius);
+    $(innerCircle.elem).addClass('moveTocenter');
+}
+
 function mouseMoveEvent(e) {
-    
+    $(innerCircle.elem).removeClass('moveTocenter');
     if(e.type == "touchmove" || e.type == "touchstart") {
         touch = true;
         e.pageX = e.originalEvent.touches[0].pageX;
@@ -152,6 +162,12 @@ function deviceSupport() {
         refreshValues();   
     }
 }
+function resetvalues() {
+    velocityX = 0;
+    velocityY = 0;
+    _x = 0;
+    _y = 0;  
+}
 var alpha,beta, gamma, ax1,ay1,az1,ax,ay,az;
 var velocityX = 0, velocityY = 0;
 var _x = 0; _y = 0;
@@ -189,6 +205,11 @@ function motionEvent(e) {
         setInnerCircle(mainCircle.radius + _x , mainCircle.radius + _y, true);
         _x = _x - mainCircle.radius;
         _y = _y - mainCircle.radius;
+    }
+
+    if(ax == 0 && ay == 0) {
+        setInnerCircle();
+        resetvalues();
     }
 
     if(ax > 0) {
