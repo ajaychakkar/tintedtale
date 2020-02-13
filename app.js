@@ -54,8 +54,11 @@ function mouseMoveEventmouseOutsideCircle(e) {
     moveInnerCircleToCenter();
 }
 function moveInnerCircleToCenter() {
-    setLeftTop(mainCircle.radius, mainCircle.radius);
-    $(innerCircle.elem).addClass('moveTocenter');
+    //setLeftTop(mainCircle.radius, mainCircle.radius);
+    $(innerCircle.elem).animate({
+        left:mainCircle.radius - innerCircle.radius,
+        top: mainCircle.radius - innerCircle.radius
+    }, 400, 'easeOutBounce');
 }
 
 function mouseMoveEvent(e) {
@@ -216,7 +219,6 @@ function motionEvent(e) {
         moveInnerCircleToCenter();
         resetvalues();
         setTimeout(function(){
-            $(innerCircle.elem).removeClass('moveTocenter');
             snappingToCenter = false;
             refreshValues();
         },1000);
