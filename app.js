@@ -74,8 +74,10 @@ function mouseMoveEvent(e) {
         velocityX = 0;
         velocityY = 0;
         refreshValues();
+    } else { 
+        calculateMovePoint(e);
     }
-    calculateMovePoint(e);
+    
 }
 
 function calculateMovePoint(e) {
@@ -88,7 +90,7 @@ function calculateMovePoint(e) {
         if(e.type == 'touchmove') {
             _x = _offsetX - mainCircle.radius;
             _y = _offsetY - mainCircle.radius;
-        }
+        } 
         var temp = setInnerCircle(_deltaX , _deltaY);
         setLeftTop(temp.deltax, temp.deltay);
     }
