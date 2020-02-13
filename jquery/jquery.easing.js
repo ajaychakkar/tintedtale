@@ -22,7 +22,7 @@
         c5 = 2 * PI / 4.5;
 
     function bounceOut(x) {
-        var n1 = 7.5625,
+        var n1 = 16,
             d1 = 2.75;
         if (x < 1 / d1) {
             return n1 * x * x

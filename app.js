@@ -70,10 +70,15 @@ function mouseMoveEvent(e) {
         clearInterval(interVal);
     }
     if(e.type == 'touchend') {
-        touch = false; 
-        velocityX = 0;
-        velocityY = 0;
-        refreshValues();
+        touch = false;
+        snappingToCenter = true;
+        clearInterval(interVal);
+        moveInnerCircleToCenter();
+        resetvalues();
+        setTimeout(function(){
+            snappingToCenter = false;
+            refreshValues();
+        },1000);
     } else { 
         calculateMovePoint(e);
     }
