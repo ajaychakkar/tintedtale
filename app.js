@@ -44,10 +44,17 @@ function setMouseEvent() {
     if(BrowserDetect.any()) {
         $(mainCircle.elem).off('touchmove touchstart touchend').on('touchmove touchstart touchend', mouseMoveEvent);
     } else {
-        $(mainCircle.elem).off('mousemove').on('mousemove', mouseMoveEvent);
-        $(mainCircle.elem).off('mouseout').on('mouseout', mouseMoveEventmouseOutsideCircle);
-    }
-    
+        $(document).off('mousedown').on('mousedown', mouseDownEvent);
+        //$(mainCircle.elem).off('mouseout').on('mouseout', mouseMoveEventmouseOutsideCircle);
+    }   
+}
+function mouseDownEvent(e) {
+    if(e.type == 'mousedown') {
+        if(e.pageX >=  mainCircle.left && e.pageX <=  (mainCircle.left + mainCircle.width) && 
+       e.pageY >=  mainCircle.top && e.pageY <=  (mainCircle.top + mainCircle.height)) {
+            $(document).off('mousemove mouseup').on('mousemove mouseup',calculateMovePoint);
+       }
+    } 
 }
 
 function mouseMoveEventmouseOutsideCircle(e) {
@@ -62,13 +69,13 @@ function moveInnerCircleToCenter() {
 }
 
 function mouseMoveEvent(e) {
-    $(innerCircle.elem).removeClass('moveTocenter');
     if(e.type == "touchmove" || e.type == "touchstart") {
         touch = true;
         e.pageX = e.originalEvent.touches[0].pageX;
         e.pageY = e.originalEvent.touches[0].pageY;
         clearInterval(interVal);
     }
+   
     if(e.type == 'touchend') {
         touch = false;
         snappingToCenter = true;
@@ -86,6 +93,25 @@ function mouseMoveEvent(e) {
 }
 
 function calculateMovePoint(e) {
+    if(e.type == 'mouseup') {
+        $(document).off('mousemove mouseup');
+        moveInnerCircleToCenter();
+    }
+   // if(e.pageX >=  mainCircle.left && e.pageX <=  (mainCircle.left + mainCircle.width) && 
+    //   e.pageY >=  mainCircle.top && e.pageY <=  (mainCircle.top + mainCircle.height)) {
+        var _offsetX = e.pageX - mainCircle.left;
+        var _offsetY = e.pageY - mainCircle.top;
+        var _deltaX = _offsetX;
+        var _deltaY = _offsetY;
+        if(e.type == 'touchmove') {
+            _x = _offsetX - mainCircle.radius;
+            _y = _offsetY - mainCircle.radius;
+        } 
+        var temp = setInnerCircle(_deltaX , _deltaY);
+        setLeftTop(temp.deltax, temp.deltay);
+   // }
+}  
+function documentMouseMove(e) {
     if(e.pageX >=  mainCircle.left && e.pageX <=  (mainCircle.left + mainCircle.width) && 
        e.pageY >=  mainCircle.top && e.pageY <=  (mainCircle.top + mainCircle.height)) {
         var _offsetX = e.pageX - mainCircle.left;
@@ -99,7 +125,7 @@ function calculateMovePoint(e) {
         var temp = setInnerCircle(_deltaX , _deltaY);
         setLeftTop(temp.deltax, temp.deltay);
     }
-}  
+}
 function setInnerCircle(_deltaX , _deltaY, ignoreValues) {
     var _angle = Math.atan((_deltaY - mainCircle.radius) / (_deltaX - mainCircle.radius));
     if(mainCircle.radius < _deltaX ) {
