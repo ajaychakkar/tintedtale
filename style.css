@@ -38,7 +38,6 @@ body, html {
     left: 25%;
     top: 25%;
     border-radius: 50%;
-    pointer-events: none;
 }
 .moveTocenter {
     transition: all 0.5s ease;
