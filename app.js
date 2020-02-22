@@ -112,6 +112,7 @@
      }
 
      if (e.type == 'touchend') {
+         touch = false;
         startSpringAnimationOndevice();
      } else {
          calculateMovePoint(e);
