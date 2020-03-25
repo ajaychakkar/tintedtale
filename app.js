@@ -254,12 +254,16 @@ function setLeftTop(_deltaX, _deltaY) {
 function deviceSupport() {
     if (window.DeviceMotionEvent)
         if (BrowserDetect.iOS()) {
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
             window.DeviceMotionEvent.requestPermission()
                 .then(function (response) {
                     if (response == 'granted') {
                         addDeviceMotionEvent();
                     }
                 }).catch(console.error)
+            } else {
+                addDeviceMotionEvent();
+            } 
         } else if (BrowserDetect.any()) {
             addDeviceMotionEvent()
     }
